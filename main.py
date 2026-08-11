@@ -5,6 +5,8 @@ from schemas import CodeReviewResult
 
 app = FastAPI(title="AI Code Reviewer")
 
+MAX_CODE_LENGTH = 10_000
+
 
 class ReviewRequest(BaseModel):
     code: str
@@ -19,6 +21,8 @@ def read_root():
 def review(request: ReviewRequest):
     if not request.code.strip():
         raise HTTPException(status_code=400, detail="Code field cannot be empty")
+    if len(request.code) > MAX_CODE_LENGTH:
+        raise HTTPException(status_code=400, detail=f"Code exceeds {MAX_CODE_LENGTH} character limit")
 
     try:
         return review_code(request.code)
